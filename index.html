@@ -1,0 +1,814 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Leitner">
+<meta name="theme-color" content="#EEF1F4">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<style>[hidden]{display:none!important}</style>
+<title>IELTS Leitner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,500;7..72,700&family=Vazirmatn:wght@400;600&display=swap">
+<style>
+:root{
+  --bg:#EEF1F4; --surface:#FFFFFF; --surface2:#F6F8FA; --ink:#15202E; --ink2:#4A5868; --ink3:#8491A0;
+  --line:#DCE2E8; --accent:#1F5FBF; --accent-ink:#FFFFFF; --accent-soft:#E3ECFA;
+  --good:#1E8A5A; --good-soft:#DDF2E7; --bad:#C2413A; --bad-soft:#F9E1DF; --hl:rgba(255,196,0,.34);
+  --b0:#0E8F9A; --b1:#D9534F; --b2:#E8893A; --b3:#D8B42A; --b4:#5DA56B; --b5:#2F7FC1; --b6:#6B5CC4;
+  --serif:"Literata", Georgia, "Times New Roman", serif;
+  --sans:-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+  --fa:"Vazirmatn", Tahoma, "Geeza Pro", sans-serif;
+  --r:14px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  color-scheme:dark;
+  --bg:#0F141A; --surface:#19212B; --surface2:#141B23; --ink:#E8EDF2; --ink2:#AAB6C3; --ink3:#6F7C8A;
+  --line:#2A3542; --accent:#6EA2F2; --accent-ink:#0B1420; --accent-soft:#1D2B40;
+  --good:#4CC38A; --good-soft:#153326; --bad:#F07A72; --bad-soft:#3A1C1A; --hl:rgba(255,196,0,.28);
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0F141A; --surface:#19212B; --surface2:#141B23; --ink:#E8EDF2; --ink2:#AAB6C3; --ink3:#6F7C8A;
+  --line:#2A3542; --accent:#6EA2F2; --accent-ink:#0B1420; --accent-soft:#1D2B40;
+  --good:#4CC38A; --good-soft:#153326; --bad:#F07A72; --bad-soft:#3A1C1A; --hl:rgba(255,196,0,.28);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.45 var(--sans);-webkit-text-size-adjust:100%}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer;touch-action:manipulation}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+#shell{position:fixed;inset:0;display:flex;flex-direction:column}
+header.top{padding:calc(env(safe-area-inset-top,0px) + 10px) 16px 10px;background:var(--bg);display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+header.top h1{margin:0;font:700 28px/1.1 var(--sans);letter-spacing:-.02em}
+header.top .sub{color:var(--ink3);font-size:13px}
+main{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:4px 16px 24px}
+nav.tabs{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);background:var(--surface);padding-bottom:env(safe-area-inset-bottom,0px)}
+nav.tabs button{background:none;border:0;padding:8px 0 6px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;color:var(--ink3)}
+nav.tabs button svg{width:24px;height:24px}
+nav.tabs button[aria-selected="true"]{color:var(--accent)}
+
+.group{background:var(--surface);border-radius:var(--r);overflow:hidden;margin:0 0 18px}
+.group-title{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);margin:18px 4px 6px}
+.row{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--line);min-height:48px}
+.row:last-child{border-bottom:0}
+.row .grow{flex:1;min-width:0}
+.row .muted{color:var(--ink3);font-size:13px}
+.btn{border:0;border-radius:12px;padding:12px 16px;background:var(--accent);color:var(--accent-ink);font-weight:600}
+.btn.block{width:100%;display:block}
+.btn.ghost{background:var(--accent-soft);color:var(--accent)}
+.btn.plain{background:none;color:var(--accent);padding:8px 6px}
+.btn.danger{background:var(--bad-soft);color:var(--bad)}
+.btn:disabled{opacity:.45}
+.pill{display:inline-flex;align-items:center;gap:4px;border-radius:999px;padding:2px 9px;font-size:12px;font-weight:600;white-space:nowrap}
+input.field,textarea.field,select.field{width:100%;border:1px solid var(--line);background:var(--surface2);border-radius:10px;padding:10px 12px;font-size:16px}
+textarea.field{min-height:70px;resize:vertical}
+label.lbl{display:block;font-size:12px;color:var(--ink3);margin:12px 2px 5px;letter-spacing:.04em;text-transform:uppercase}
+
+/* Review home */
+.hero{background:var(--surface);border-radius:20px;padding:18px;margin:6px 0 18px;display:grid;gap:14px}
+.hero .big{font:700 52px/1 var(--sans);letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.hero .cap{color:var(--ink2)}
+.boxes{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;align-items:end;height:120px;padding:0 2px}
+.boxes .col{display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end}
+.boxes .bar{width:100%;border-radius:6px 6px 3px 3px;min-height:4px}
+.boxes .n{font-size:12px;font-weight:600;font-variant-numeric:tabular-nums}
+.boxes .k{font-size:11px;color:var(--ink3)}
+
+.lrow{width:100%;border:0;border-bottom:1px solid var(--line);background:none;text-align:left}
+.lrow .cnt{font-variant-numeric:tabular-nums;min-width:22px;text-align:right}
+.cells{display:flex;flex-wrap:wrap;gap:4px}
+.cell{font-style:normal;width:26px;height:26px;border-radius:6px;border:1.5px solid var(--line);display:grid;place-items:center;font-size:11px;font-weight:700;color:var(--ink2);font-variant-numeric:tabular-nums}
+.cell.on{border-color:var(--c);background:color-mix(in srgb,var(--c) 18%,transparent)}
+.ready{margin-left:6px;align-self:center;font-size:12px;font-weight:700;color:#fff;background:var(--c);border-radius:999px;padding:3px 9px}
+.rules summary{list-style:none;cursor:pointer}.rules summary::-webkit-details-marker{display:none}
+.rules summary::after{content:"+";color:var(--ink3);font-size:20px}.rules[open] summary::after{content:"−"}
+.rules ol{margin:0;padding:4px 18px 14px 34px;color:var(--ink2);display:grid;gap:6px}
+.cell.rev{border-style:dashed;border-color:var(--c)}
+.cell.rev.on{background:var(--c);color:#fff;border-style:solid}
+.wchip{display:inline-flex;gap:2px}
+.chipbtn.ok{color:var(--good);border-color:var(--good);font-weight:700}
+.locrow{display:flex;gap:8px;align-items:center;margin:6px 0 2px}
+.locrow select{width:auto;flex:1;padding:7px 10px;font-size:15px}
+/* Review session */
+#review{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;z-index:30}
+#review .rtop{padding:calc(env(safe-area-inset-top,0px) + 8px) 12px 8px;display:flex;align-items:center;gap:10px}
+#review .prog{flex:1;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+#review .prog i{display:block;height:100%;background:var(--accent);width:0}
+.flash{flex:1;margin:8px 16px;background:var(--surface);border-radius:22px;padding:22px 20px;overflow-y:auto;display:flex;flex-direction:column;gap:14px}
+.flash .word{font:700 34px/1.15 var(--serif);text-align:center;margin-top:12vh;overflow-wrap:anywhere}
+.flash.shown .word{margin-top:0}
+.flash .phon{text-align:center;color:var(--ink3)}
+.fa{font-family:var(--fa);direction:rtl;text-align:right;font-size:19px;line-height:1.7}
+.ex{font-family:var(--serif);font-size:16px;color:var(--ink2);border-left:3px solid var(--line);padding:2px 0 2px 12px}
+.ex b{color:var(--ink);background:var(--hl);font-weight:600;padding:0 2px;border-radius:3px}
+.endef{font-size:15px;color:var(--ink2)}
+.endef em{color:var(--ink3);font-style:normal;font-size:12px;text-transform:uppercase;letter-spacing:.04em;margin-right:6px}
+.ractions{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:8px 16px calc(env(safe-area-inset-bottom,0px) + 14px)}
+.ractions .btn{padding:16px;font-size:17px}
+.btn.no{background:var(--bad-soft);color:var(--bad)}
+.btn.yes{background:var(--good-soft);color:var(--good)}
+.iconbtn{border:0;background:var(--accent-soft);color:var(--accent);width:40px;height:40px;border-radius:50%;display:inline-grid;place-items:center;flex:none}
+.iconbtn svg{width:20px;height:20px}
+.iconbtn.flat{background:none}
+
+/* Book */
+.progress-line{height:8px;background:var(--line);border-radius:4px;overflow:hidden}
+.progress-line i{display:block;height:100%;background:var(--good)}
+.toc .row{padding:10px 14px}
+.toc .part{font-weight:700;font-size:16px;background:var(--surface2)}
+.toc .unit{font-weight:600}
+.toc .sub{padding-left:30px;font-size:14px;color:var(--ink2)}
+.toc .pg{color:var(--ink3);font-size:13px;font-variant-numeric:tabular-nums;min-width:34px;text-align:right}
+.chk{width:26px;height:26px;border-radius:50%;border:2px solid var(--line);background:none;flex:none;display:grid;place-items:center;padding:0}
+.chk[aria-pressed="true"]{background:var(--good);border-color:var(--good);color:#fff}
+.chk svg{width:14px;height:14px}
+
+/* Reader */
+#reader{position:fixed;inset:0;background:var(--surface2);z-index:20;display:flex;flex-direction:column}
+#reader .rbar{display:flex;align-items:center;gap:8px;padding:calc(env(safe-area-inset-top,0px) + 6px) 10px 6px;background:var(--surface);border-bottom:1px solid var(--line)}
+#reader .rhint{font-size:11px;color:var(--ink3)}
+#reader .rbar .ttl{flex:1;min-width:0;font-size:13px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#pageScroll{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;touch-action:pan-x pan-y}
+#pageWrap{position:relative;margin:0 auto;background:#fff;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+#pageWrap img{display:block;width:100%;height:auto;max-width:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+#pageWrap .w{position:absolute;border-radius:3px;cursor:pointer}
+#pageWrap .w.saved{background:rgba(30,138,90,.18);box-shadow:inset 0 -2px 0 rgba(30,138,90,.55)}
+#pageWrap .w.sel{background:var(--hl);box-shadow:0 0 0 1px rgba(200,150,0,.6)}
+#reader .rfoot{display:flex;align-items:center;gap:8px;padding:6px 10px calc(env(safe-area-inset-bottom,0px) + 6px);background:var(--surface);border-top:1px solid var(--line)}
+#reader .rfoot input{width:64px;text-align:center;padding:6px;font-size:16px}
+#reader .rfoot .sp{flex:1}
+.zoombtn{border:1px solid var(--line);background:var(--surface2);border-radius:8px;padding:6px 10px;font-size:13px;font-weight:600}
+.empty{padding:28px 18px;text-align:center;color:var(--ink2)}
+.empty h3{margin:0 0 6px;color:var(--ink);font-size:18px}
+.loading-note{font-size:13px;color:var(--ink3)}
+
+/* Sheet */
+#scrim{position:fixed;inset:0;background:rgba(10,15,22,.38);z-index:40}
+#sheet{position:fixed;left:0;right:0;bottom:0;z-index:41;background:var(--surface);border-radius:20px 20px 0 0;max-height:88%;display:flex;flex-direction:column;box-shadow:0 -8px 30px rgba(0,0,0,.18)}
+#sheet .grab{width:38px;height:5px;border-radius:3px;background:var(--line);margin:8px auto 2px}
+#sheet .sbody{overflow-y:auto;padding:6px 18px 12px}
+#sheet .sfoot{padding:10px 18px calc(env(safe-area-inset-bottom,0px) + 12px);border-top:1px solid var(--line);display:flex;gap:10px}
+#sheet .sfoot .btn{flex:1}
+.headrow{display:flex;align-items:center;gap:8px}
+.headrow input{flex:1;min-width:0;border:0;background:none;font:700 26px/1.2 var(--serif);padding:4px 0}
+.extend{display:flex;gap:6px;margin:2px 0 4px;flex-wrap:wrap}
+.chipbtn{border:1px solid var(--line);background:var(--surface2);border-radius:999px;padding:5px 11px;font-size:13px;color:var(--ink2)}
+.opts{display:flex;flex-direction:column;gap:6px}
+.opt{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:none;text-align:left;width:100%}
+.opt[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.opt .dot{width:18px;height:18px;border-radius:50%;border:2px solid var(--ink3);flex:none;margin-top:3px}
+.opt[aria-pressed="true"] .dot{border-color:var(--accent);background:var(--accent);box-shadow:inset 0 0 0 3px var(--surface)}
+.opt.faopt{flex-direction:row-reverse;text-align:right}
+.src{font-size:11px;color:var(--ink3);margin-left:4px;text-transform:none;letter-spacing:0}
+.tagbox{display:flex;flex-wrap:wrap;gap:6px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:6px;background:var(--surface2)}
+.tagbox input{border:0;background:none;flex:1;min-width:90px;padding:4px;font-size:16px}
+.tag{background:var(--accent-soft);color:var(--accent);border:0;border-radius:999px;padding:3px 9px;font-size:13px}
+.tag::after{content:" ×";opacity:.6}
+.boxpill{color:#fff}
+.note{font-size:13px;color:var(--ink3)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 80px);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;z-index:60;font-size:14px;max-width:88%;text-align:center}
+.search{position:sticky;top:0;background:var(--bg);padding:2px 0 10px;z-index:2}
+.filters{display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:4px;scrollbar-width:none}
+.filters button{flex:none}
+.filters button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.cardrow .w1{font:600 17px/1.2 var(--serif)}
+.cardrow .fa1{font-family:var(--fa);direction:rtl;font-size:14px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fab{position:absolute;right:18px;bottom:calc(env(safe-area-inset-bottom,0px) + 70px);width:56px;height:56px;border-radius:50%;border:0;background:var(--accent);color:var(--accent-ink);box-shadow:0 6px 18px rgba(0,0,0,.2);display:grid;place-items:center;z-index:5}
+.fab svg{width:26px;height:26px}
+.confirm{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+@media (prefers-reduced-motion: no-preference){
+  #sheet{animation:up .22s ease-out}
+  @keyframes up{from{transform:translateY(40px);opacity:.4}to{transform:none;opacity:1}}
+}
+@media (min-width:700px){ main{padding-inline:max(16px,calc(50% - 340px))} }
+</style>
+
+</head>
+<body>
+<div id="shell">
+  <header class="top"><div><div class="sub" id="topSub">Cambridge Guide to IELTS</div><h1 id="topTitle">Review</h1></div><div id="topAction"></div></header>
+  <main id="main"></main>
+  <nav class="tabs" role="tablist" id="tabs">
+    <button role="tab" data-tab="review" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="6" width="14" height="14" rx="2.5"/><path d="M7 3h11.5A2.5 2.5 0 0 1 21 5.5V17"/></svg>Review</button>
+    <button role="tab" data-tab="book" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 6.5C10 5 7 4.5 3.5 5v13.5c3.5-.5 6.5 0 8.5 1.5 2-1.5 5-2 8.5-1.5V5C17 4.5 14 5 12 6.5Z"/><path d="M12 6.5V20"/></svg>Book</button>
+    <button role="tab" data-tab="cards" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Words</button>
+    <button role="tab" data-tab="settings" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg>Settings</button>
+  </nav>
+</div>
+<div id="layer"></div>
+<input type="file" id="packInput" hidden>
+<input type="file" id="dictInput" accept=".csv,.tsv,.txt,.json,text/*,application/json" hidden>
+
+<script>
+"use strict";
+/* ---------- constants ---------- */
+const INTERVALS=[0,1,2,4,8,15]; // parts in box 1..5 = days a word spends in that box
+const BOXCOL=["var(--b0)","var(--b1)","var(--b2)","var(--b3)","var(--b4)","var(--b5)","var(--b6)"];
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const today=()=>{const d=new Date();return Math.floor((d.getTime()-d.getTimezoneOffset()*60000)/86400000)+(window.__dayOffset||0)};
+const ICON={
+  speak:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5 6 9H3v6h3l5 4V5Z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>',
+  back:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m15 18-6-6 6-6"/></svg>',
+  next:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m9 18 6-6-6-6"/></svg>',
+  close:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 6l12 12M18 6 6 18"/></svg>',
+  check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg>',
+  plus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>',
+  list:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>'
+};
+
+/* ---------- IndexedDB ---------- */
+let DB=null;
+function openDB(){return new Promise((res)=>{try{
+  const r=indexedDB.open("ielts-leitner",2);
+  r.onupgradeneeded=()=>{const d=r.result;["kv","cards","pages","ocr","udict","dcache"].forEach(n=>{if(!d.objectStoreNames.contains(n))d.createObjectStore(n,n==="cards"?{keyPath:"id"}:undefined)})};
+  r.onsuccess=()=>res(r.result);r.onerror=()=>res(null);
+}catch(e){res(null)}})}
+function tx(store,mode,fn){return new Promise((res,rej)=>{if(!DB)return res(undefined);try{const t=DB.transaction(store,mode);const s=t.objectStore(store);let out;const r=fn(s);if(r&&"onsuccess"in r)r.onsuccess=()=>{out=r.result};t.oncomplete=()=>res(out);t.onerror=()=>rej(t.error);t.onabort=()=>rej(t.error)}catch(e){rej(e)}})}
+const kvGet=k=>tx("kv","readonly",s=>s.get(k));
+const kvSet=(k,v)=>tx("kv","readwrite",s=>s.put(v,k));
+/* in-memory fallback when IDB is unavailable */
+const MEM={cards:new Map()};
+
+/* ---------- state ---------- */
+const S={tab:"review",cards:[],settings:{accent:"en-GB",rate:0.9,online:true},book:null,read:{},lastPage:5,filterBox:-1,filterTag:"",q:""};
+
+async function loadAll(){
+  DB=await openDB();
+  try{const c=await tx("cards","readonly",s=>s.getAll());S.cards=c||[]}catch(e){S.cards=[]}
+  for(const c of S.cards){if(migrate(c))await saveCard(c)}
+  await tick();
+  try{Object.assign(S.settings,(await kvGet("settings"))||{})}catch(e){}
+  S.book=await loadBuiltinBook();
+  if(!S.book){try{S.book=(await kvGet("bookMeta"))||null}catch(e){}}
+  try{S.read=(await kvGet("read"))||{}}catch(e){}
+  try{S.lastPage=(await kvGet("lastPage"))||5}catch(e){}
+  try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
+}
+async function saveCard(c){c.updated=Date.now();const i=S.cards.findIndex(x=>x.id===c.id);if(i>=0)S.cards[i]=c;else S.cards.push(c);try{await tx("cards","readwrite",s=>s.put(c))}catch(e){toast("Could not save to this device's storage.")}}
+async function deleteCard(id){S.cards=S.cards.filter(c=>c.id!==id);try{await tx("cards","readwrite",s=>s.delete(id))}catch(e){}}
+const saveSettings=()=>kvSet("settings",S.settings).catch(()=>{});
+
+/* ---------- toast ---------- */
+let toastT;function toast(msg){let t=$(".toast");if(!t){t=document.createElement("div");t.className="toast";t.setAttribute("role","status");document.body.appendChild(t)}t.textContent=msg;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>t.hidden=true,2200)}
+
+/* ---------- speech ---------- */
+function speak(text){try{const s=window.speechSynthesis;if(!s)return toast("Speech is not available here.");s.cancel();const u=new SpeechSynthesisUtterance(text);u.lang=S.settings.accent;u.rate=S.settings.rate;const v=s.getVoices().find(v=>v.lang&&v.lang.replace("_","-").startsWith(S.settings.accent));if(v)u.voice=v;s.speak(u)}catch(e){}}
+try{speechSynthesis.getVoices()}catch(e){}
+
+/* ---------- dictionaries ---------- */
+const DICT={fa:{},en:{},prom:{},keys:{},forms:{},rank:new Map(),user:new Map(),loading:null,faCount:161758,enCount:152286};
+const ONLINE_OK=!/claude\.ai|anthropic|usercontent/.test(location.hostname);
+const shardOf=w=>{const c=(w||"")[0];return c>="a"&&c<="z"?c:"_"};
+function getShard(kind,c){const k=kind+c;if(DICT[kind][c])return Promise.resolve(DICT[kind][c]);
+  if(!DICT.prom[k])DICT.prom[k]=(async()=>{let j=null;try{j=await tx("dcache","readonly",s=>s.get(k))}catch(e){}
+    if(!j){try{const r=await fetch(`dict/${kind}/${c}.json`);if(r.ok){j=await r.json();tx("dcache","readwrite",s=>s.put(j,k)).catch(()=>{})}}catch(e){}}
+    if(!j){delete DICT.prom[k];return {}}DICT[kind][c]=j;return j})();
+  return DICT.prom[k]}
+function loadDicts(){if(DICT.loading)return DICT.loading;DICT.loading=(async()=>{
+  const get=async u=>{try{const r=await fetch(u);if(r.ok)return await r.json()}catch(e){}return null};
+  const [f,c]=await Promise.all([get("dict/forms.json"),get("dict/common.json")]);
+  DICT.forms=f||{};(c||[]).forEach((w,i)=>DICT.rank.set(w,i));
+  try{const all=await tx("udict","readonly",s=>s.getAll());const keys=await tx("udict","readonly",s=>s.getAllKeys());(keys||[]).forEach((k,i)=>DICT.user.set(k,all[i]))}catch(e){}
+})();return DICT.loading}
+async function suggest(prefix){
+  prefix=prefix.toLowerCase().trim();if(prefix.length<2)return[];const c=shardOf(prefix);
+  if(!DICT.keys[c]){const [a,b]=await Promise.all([getShard("fa",c),getShard("en",c)]);const set=new Set([...Object.keys(a),...Object.keys(b)]);DICT.user.forEach((_,k)=>{if(shardOf(k)===c)set.add(k)});DICT.keys[c]=[...set]}
+  const hits=[];for(const k of DICT.keys[c]){if(k.startsWith(prefix)&&!/[^a-z '\-]/.test(k))hits.push(k)}
+  const r=k=>DICT.rank.has(k)?DICT.rank.get(k):1e6;
+  hits.sort((a,b)=>(a===prefix?-1:0)-(b===prefix?-1:0)||(a.includes(" ")-b.includes(" "))||r(a)-r(b)||a.length-b.length||a.localeCompare(b));
+  return hits.slice(0,8);
+}
+function candidates(w){
+  w=w.toLowerCase().replace(/[’‘]/g,"'").trim();const out=[w];const add=x=>{if(x&&x.length>1&&!out.includes(x))out.push(x)};
+  if(DICT.forms&&DICT.forms[w])add(DICT.forms[w]);
+  if(w.endsWith("'s"))add(w.slice(0,-2));
+  if(w.endsWith("ies"))add(w.slice(0,-3)+"y");
+  if(w.endsWith("es"))add(w.slice(0,-2));
+  if(w.endsWith("s")&&!w.endsWith("ss"))add(w.slice(0,-1));
+  if(w.endsWith("ied"))add(w.slice(0,-3)+"y");
+  if(w.endsWith("ed")){add(w.slice(0,-2));add(w.slice(0,-1));if(/(.)\1ed$/.test(w))add(w.slice(0,-3))}
+  if(w.endsWith("ing")){add(w.slice(0,-3));add(w.slice(0,-3)+"e");if(/(.)\1ing$/.test(w))add(w.slice(0,-4))}
+  if(w.endsWith("ly")){add(w.slice(0,-2));if(w.endsWith("ily"))add(w.slice(0,-3)+"y")}
+  if(w.endsWith("er"))add(w.slice(0,-2));if(w.endsWith("est"))add(w.slice(0,-3));
+  return out;
+}
+function splitMeanings(s){return String(s).split(/\s*[;|،,]\s*|\s*\n\s*/).map(x=>x.trim()).filter(Boolean)}
+async function offlineLookup(word){
+  const c=candidates(word);let fa=[],en=[],head=word.toLowerCase().trim();const orig=head;
+  const shards=[...new Set(c.map(shardOf))];await Promise.all(shards.flatMap(s=>[getShard("fa",s),getShard("en",s)]));
+  for(const k of c){const u=DICT.user.get(k);if(u){splitMeanings(u).forEach(m=>fa.push({t:m,src:"your dictionary"}));head=k;break}}
+  for(const k of c){const v=(DICT.fa[shardOf(k)]||{})[k];if(v){v.forEach(m=>{if(!fa.some(x=>x.t===m))fa.push({t:m,src:"offline"})});if(head===orig)head=k;break}}
+  for(const k of c){const v=(DICT.en[shardOf(k)]||{})[k];if(v){v.forEach(d=>en.push({pos:d[0],t:d[1],ex:d[2]||"",src:"WordNet"}));if(head===orig)head=k;break}}
+  return {head,fa,en};
+}
+async function onlineLookup(word){
+  const res={fa:[],en:[],phon:""};if(!ONLINE_OK||!S.settings.online||navigator.onLine===false)return res;
+  const tm=(p,ms)=>Promise.race([p,new Promise((_,r)=>setTimeout(()=>r(new Error("timeout")),ms))]);
+  const jobs=[
+    tm(fetch("https://api.dictionaryapi.dev/api/v2/entries/en/"+encodeURIComponent(word)).then(r=>r.ok?r.json():null),6000).then(j=>{
+      if(!Array.isArray(j))return;const e=j[0];res.phon=e.phonetic||(e.phonetics||[]).map(p=>p.text).find(Boolean)||"";
+      j.forEach(e=>(e.meanings||[]).forEach(m=>(m.definitions||[]).slice(0,2).forEach(d=>{if(res.en.length<6)res.en.push({pos:m.partOfSpeech,t:d.definition,ex:d.example||"",src:"online"})})))
+    }).catch(()=>{}),
+    tm(fetch("https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=fa&dt=t&dt=bd&q="+encodeURIComponent(word)).then(r=>r.ok?r.json():null),6000).then(j=>{
+      if(!j)return;const seen=new Set();
+      (j[1]||[]).forEach(b=>(b[1]||[]).slice(0,4).forEach(t=>{if(!seen.has(t)){seen.add(t);res.fa.push({t,src:"Google · "+b[0]})}}));
+      const main=(j[0]||[]).map(x=>x[0]).join("").trim();if(main&&!seen.has(main))res.fa.unshift({t:main,src:"Google"});
+    }).catch(()=>tm(fetch("https://api.mymemory.translated.net/get?langpair=en|fa&q="+encodeURIComponent(word)).then(r=>r.json()),6000).then(j=>{const t=j&&j.responseData&&j.responseData.translatedText;if(t)res.fa.push({t,src:"MyMemory"})}).catch(()=>{}))
+  ];
+  await Promise.all(jobs);return res;
+}
+
+/* ---------- Leitner ----------
+   box 0 = Zero learning, 1..5 = Leitner boxes with 1,2,4,8,15 parts, 6 = mastered.
+   Only box 1 and the LAST part of boxes 2-5 are reviewed. Once a day, a box whose last part is empty
+   moves every word forward one part. A box whose last part still has words waits. */
+const SIZE=INTERVALS;
+const BOXNAME=b=>b===0?"Zero learning":b===6?"Mastered":"Box "+b;
+function migrate(c){if(c.v===2)return false;const t=today();
+  if(c.box>=1&&c.box<=5){const P=SIZE[c.box];const d=Math.max(0,(c.due==null?t:c.due)-t);c.part=c.box===1?1:Math.max(1,P-d);c.arrived=(c.box===1&&d>=1)?t:t-1}
+  else{c.part=1;c.arrived=t-1}c.v=2;return true}
+function isDue(c){if(c.box===1)return c.arrived<today();if(c.box>=2&&c.box<=5)return c.part>=SIZE[c.box];return false}
+const dueCards=()=>S.cards.filter(isDue);
+let tickDay=null;
+async function tick(){const t=today();if(tickDay===t)return;tickDay=t;
+  let st={};try{st=(await kvGet("boxShift"))||{}}catch(e){}
+  const changed=new Set();
+  for(let b=2;b<=5;b++){const last=st[b];st[b]=t;if(last==null||last>=t)continue;const P=SIZE[b];
+    for(let n=t-last;n>0;n--){const inBox=S.cards.filter(c=>c.box===b);if(!inBox.length||inBox.some(c=>c.part>=P))break;inBox.forEach(c=>{c.part++;changed.add(c)})}}
+  try{await kvSet("boxShift",st)}catch(e){}
+  for(const c of changed)await saveCard(c);
+}
+function grade(c,ok){const t=today();c.reviews=(c.reviews||0)+1;c.last=t;
+  if(ok){c.box=Math.min(6,c.box+1);c.part=1}else{c.box=0;c.part=1;c.lapses=(c.lapses||0)+1}
+  c.arrived=t;return saveCard(c)}
+function approveZero(c){c.box=1;c.part=1;c.arrived=today();return saveCard(c)}
+function moveCard(c,b,part){c.box=b;c.part=b>=2&&b<=5?Math.max(1,Math.min(SIZE[b],part||1)):1;c.arrived=today()-1;return saveCard(c)}
+function newCard(f){return Object.assign({id:"c"+Date.now().toString(36)+Math.random().toString(36).slice(2,6),word:"",phon:"",fa:"",en:"",example:"",page:null,tags:[],box:0,part:1,arrived:today(),v:2,created:Date.now(),reviews:0,lapses:0},f)}
+
+/* ---------- routing ---------- */
+function setTab(t){S.tab=t;document.querySelectorAll("#tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===t));render()}
+$("#tabs").addEventListener("click",e=>{const b=e.target.closest("button[data-tab]");if(b)setTab(b.dataset.tab)});
+function setTop(title,sub,actionHTML){$("#topTitle").textContent=title;$("#topSub").textContent=sub||"";$("#topAction").innerHTML=actionHTML||""}
+function render(){if(tickDay!==today()){tick().then(render);return}const m=$("#main");m.scrollTop=0;({review:renderReview,book:renderBook,cards:renderCards,settings:renderSettings})[S.tab](m)}
+
+/* ---------- Review tab ---------- */
+function renderReview(m){
+  const due=dueCards().length,total=S.cards.length;
+  const counts=[0,0,0,0,0,0,0];S.cards.forEach(c=>counts[c.box]++);
+  setTop("Review",new Date().toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"}));
+  const zero=S.cards.filter(c=>c.box===0);
+  m.innerHTML=`
+  <section class="hero">
+    <div><div class="big">${due}</div><div class="cap">${due===1?"word to review":"words to review"} today${total?` · ${total} words in all`:""}</div></div>
+    ${due?`<button class="btn block" id="startRev" style="padding:15px;font-size:17px">Start review</button>`:
+      total?`<div class="note">Nothing to review right now. Box 1 and the last part of each box come up for review.</div>`:
+      `<div class="note">Open the book, tap any word, and add it. New words start in Zero learning.</div>`}
+  </section>
+  <div class="group-title">Zero learning</div>
+  <div class="group zero">
+    <button class="row lrow" data-box="0"><div class="grow"><div style="display:flex;align-items:center;gap:8px"><span class="pill boxpill" style="background:${BOXCOL[0]}">Zero learning</span><span style="flex:1"></span><b class="cnt">${zero.length}</b></div>
+      <div class="muted" style="margin-top:6px">${zero.length?"New and forgotten words. Study them as often as you like, then approve each one to send it to box 1.":"Empty. New words and words you miss in a review land here."}</div></div></button>
+    ${zero.length?`<div class="row"><button class="btn block" id="zStudy">Study ${zero.length} word${zero.length>1?"s":""}</button></div>`:""}
+  </div>
+  <div class="group-title">Leitner boxes</div>
+  <div class="group">${[1,2,3,4,5].map(b=>boxRowHTML(b)).join("")}
+    <button class="row lrow" data-box="6"><span class="pill boxpill" style="background:${BOXCOL[6]}">Mastered</span><span class="grow muted">Passed all five boxes</span><b class="cnt">${counts[6]}</b></button>
+  </div>
+  <details class="group rules"><summary class="row"><b class="grow">How the Leitner box works</b></summary><ol>
+    <li>New words go into <b>Zero learning</b>. Study them as many times as you want. When you know a word, approve it and it moves to box 1.</li>
+    <li>The box has 5 sections with 1, 2, 4, 8 and 15 parts.</li>
+    <li>Only box 1 and the <b>last part</b> of each box are reviewed: box 1, part 2 of box 2, part 4 of box 3, part 8 of box 4 and part 15 of box 5.</li>
+    <li>Know it: the word moves to part 1 of the next box. Don't know it: it goes back to Zero learning.</li>
+    <li>Each day, a box whose last part is empty moves every word forward one part. If you skip a review, that box waits for you.</li>
+    <li>A word you know in the last part of box 5 is mastered. Words that reach box 1 from Zero learning are reviewed the next day.</li>
+    <li>You can move any word by hand from its word card. "Practise" never changes a box.</li>
+  </ol></details>
+  ${S.book?`<div class="group-title">Keep reading</div><div class="group"><button class="row" id="contRead" style="width:100%;border:0;background:none;text-align:left"><div class="grow"><div style="font-weight:600">Continue on page ${S.lastPage}</div><div class="muted">${esc(sectionOf(S.lastPage).join(" · "))}</div></div>${ICON.next.replace("<svg",'<svg width="18" height="18" style="color:var(--ink3)"')}</button></div>`:""}`;
+  const sb=$("#startRev");if(sb)sb.onclick=()=>startReview();
+  const zs=$("#zStudy");if(zs)zs.onclick=()=>startZero();
+  m.querySelectorAll("[data-box]").forEach(b=>b.onclick=()=>openBoxSheet(+b.dataset.box));
+  const cr=$("#contRead");if(cr)cr.onclick=()=>openReader(S.lastPage);
+}
+function boxRowHTML(b){
+  const P=SIZE[b];const cs=S.cards.filter(c=>c.box===b);const ready=cs.filter(isDue).length;const waiting=b===1?cs.length-ready:0;
+  const cells=[];for(let k=1;k<=P;k++){const n=cs.filter(c=>(c.part||1)===k).length;const last=k===P;
+    cells.push(`<i class="cell${n?" on":""}${last?" rev":""}" style="--c:${BOXCOL[b]}" title="Part ${k}${last?" (reviewed)":""}: ${n} word${n===1?"":"s"}">${n||""}</i>`)}
+  return `<button class="row lrow" data-box="${b}"><div class="grow" style="display:grid;gap:7px">
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="pill boxpill" style="background:${BOXCOL[b]}">Box ${b}</span><span class="muted">${P} part${P>1?"s":""}</span><span style="flex:1"></span>${ready?`<span class="pill" style="background:var(--accent-soft);color:var(--accent)">${ready} to review</span>`:""}<b class="cnt">${cs.length}</b></div>
+    <div class="cells">${cells.join("")}</div>${waiting?`<div class="muted" style="font-size:12px">${waiting} word${waiting>1?"s":""} arrived today, review tomorrow</div>`:""}</div></button>`}
+function openBoxSheet(b){
+  const cs=S.cards.filter(c=>c.box===b);const P=SIZE[b]||0;const groups=[];
+  if(b===0)groups.push({t:"Words to learn",l:cs,approve:true});
+  else if(b===1){groups.push({t:"Review today",l:cs.filter(isDue)});groups.push({t:"Arrived today · review tomorrow",l:cs.filter(c=>!isDue(c))})}
+  else if(b<6){for(let k=P;k>=1;k--){groups.push({t:k===P?`Part ${k} · reviewed now`:`Part ${k} · reaches the review part ${P-k===1?"tomorrow":"in "+(P-k)+" days"}`,l:cs.filter(c=>(c.part||1)===k)})}}
+  else groups.push({t:"Mastered words",l:cs});
+  const revList=b>=1&&b<=5?cs.filter(isDue):[];
+  let l=$("#sheetLayer");if(!l){l=document.createElement("div");l.id="sheetLayer";document.body.appendChild(l)}
+  l.innerHTML=`<div id="scrim"></div><div id="sheet" role="dialog" aria-label="${BOXNAME(b)}"><div class="grab"></div><div class="sbody">
+    <div class="headrow"><div style="flex:1;font:700 24px var(--sans)">${BOXNAME(b)}</div><button class="iconbtn flat" id="bxClose" aria-label="Close">${ICON.close}</button></div>
+    <div class="note" style="margin-bottom:8px">${cs.length} word${cs.length===1?"":"s"}${b>=1&&b<=5?` · ${P} part${P>1?"s":""}. Only ${b===1?"this box":"part "+P} is reviewed.`:b===0?" · tap ✓ when you know a word":""}</div>
+    ${groups.map(g=>`<label class="lbl">${g.t} <span class="src">${g.l.length}</span></label><div class="extend">${g.l.length?g.l.map(c=>`<span class="wchip"><button class="chipbtn" data-cid="${c.id}">${esc(c.word)}</button>${g.approve?`<button class="chipbtn ok" data-ok="${c.id}" aria-label="Approve ${esc(c.word)}">✓</button>`:""}</span>`).join(""):`<span class="note">Empty</span>`}</div>`).join("")}
+  </div><div class="sfoot">${b===0?`<button class="btn ghost" id="zAll" ${cs.length?"":"disabled"}>Approve all</button><button class="btn" id="zGo" ${cs.length?"":"disabled"}>Study ${cs.length}</button>`:
+    `<button class="btn ghost" id="bxAll" ${cs.length?"":"disabled"}>Practise all ${cs.length}</button>${b<6?`<button class="btn" id="bxDue" ${revList.length?"":"disabled"}>Review ${revList.length}</button>`:""}`}</div></div>`;
+  $("#scrim").onclick=closeSheet;$("#bxClose").onclick=closeSheet;
+  l.querySelectorAll("[data-cid]").forEach(x=>x.onclick=()=>openWordSheet({card:S.cards.find(c=>c.id===x.dataset.cid)}));
+  l.querySelectorAll("[data-ok]").forEach(x=>x.onclick=async()=>{const c=S.cards.find(k=>k.id===x.dataset.ok);await approveZero(c);toast(`“${c.word}” moved to box 1`);openBoxSheet(0);render()});
+  const za=$("#zAll");if(za)za.onclick=()=>{za.parentElement.innerHTML=`<div class="confirm" style="flex:1"><span style="flex:1">Send all ${cs.length} to box 1?</span><button class="btn" id="zAll2">Approve all</button><button class="btn plain" id="zAllNo">Cancel</button></div>`;
+    $("#zAll2").onclick=async()=>{for(const c of cs)await approveZero(c);closeSheet();toast("Moved to box 1");render()};$("#zAllNo").onclick=()=>openBoxSheet(0)};
+  const zg=$("#zGo");if(zg)zg.onclick=()=>{closeSheet();startZero()};
+  const a=$("#bxAll");if(a)a.onclick=()=>{closeSheet();startReview(cs.slice(),{practice:true})};const d=$("#bxDue");if(d)d.onclick=()=>{closeSheet();startReview(revList.slice())};
+}
+/* Zero learning study: loop through the words as many times as you like; "I know it" sends a word to box 1 */
+function startZero(){
+  let q=S.cards.filter(c=>c.box===0).sort(()=>Math.random()-.5);if(!q.length)return;let rounds=1,seen=0,learned=0;const L=$("#layer");
+  const show=()=>{
+    if(!q.length){L.innerHTML=`<div id="review"><div class="flash" style="justify-content:center;text-align:center"><div style="font:700 30px var(--serif)">All approved</div><div class="note" style="font-size:16px">${learned} word${learned===1?"":"s"} moved to box 1. You'll review them tomorrow.</div></div><div class="ractions" style="grid-template-columns:1fr"><button class="btn" id="rdone">Close</button></div></div>`;$("#rdone").onclick=()=>{L.innerHTML="";render()};return}
+    const c=q[0];
+    L.innerHTML=`<div id="review">
+      <div class="rtop"><button class="iconbtn flat" id="rclose" aria-label="Close">${ICON.close}</button><div style="flex:1;text-align:center" class="note">Zero learning · ${q.length} left · ${seen} views</div><span style="width:40px"></span></div>
+      <div class="flash" id="fc">
+        <div style="display:flex;justify-content:space-between;align-items:center"><span class="pill boxpill" style="background:${BOXCOL[0]}">Zero learning</span><button class="iconbtn" id="rsp" aria-label="Play pronunciation">${ICON.speak}</button></div>
+        <div class="word">${esc(c.word)}</div>
+        ${c.phon?`<div class="phon">${esc(c.phon)}</div>`:""}
+        <div id="back" hidden>${cardBackHTML(c)}</div>
+      </div>
+      <div class="ractions" id="ract"><button class="btn block" id="rshow" style="grid-column:1/-1;padding:16px;font-size:17px">Show meaning</button></div>
+    </div>`;
+    $("#rclose").onclick=()=>{L.innerHTML="";render()};$("#rsp").onclick=()=>speak(c.word);
+    $("#rshow").onclick=()=>{$("#back").hidden=false;$("#fc").classList.add("shown");speak(c.word);
+      $("#ract").innerHTML=`<button class="btn ghost" id="zAgain">Study again</button><button class="btn yes" id="zOk">I know it → Box 1</button>`;
+      $("#zAgain").onclick=()=>{seen++;q.push(q.shift());show()};
+      $("#zOk").onclick=async()=>{seen++;await approveZero(c);learned++;q.shift();show()};
+      const rp=$("#rpage");if(rp)rp.onclick=()=>openReader(c.page)};
+  };show();
+}
+function cardBackHTML(c){return `${c.fa?`<div class="fa">${esc(c.fa)}</div>`:""}
+  ${c.en?`<div class="endef" style="margin-top:10px;white-space:pre-line">${esc(c.en)}</div>`:""}
+  ${c.example?`<div class="ex" style="margin-top:14px">${highlight(c.example,c.word)}</div>`:""}
+  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:12px">${c.page?`<button class="chipbtn" id="rpage">Book p. ${c.page}</button>`:""}${(c.tags||[]).map(t=>`<span class="chipbtn" style="border-style:dashed">${esc(t)}</span>`).join("")}</div>`}
+function startReview(list,opt){const practice=!!(opt&&opt.practice);
+  const q=(list||dueCards()).sort((a,b)=>a.box-b.box||Math.random()-.5);if(!q.length)return;
+  let i=0,right=0;const L=$("#layer");
+  const show=()=>{
+    if(i>=q.length){L.innerHTML=`<div id="review"><div class="flash" style="justify-content:center;text-align:center"><div style="font:700 30px var(--serif)">Session done</div><div class="note" style="font-size:16px">${right} of ${q.length} correct. ${practice?"Practice only: no word changed box.":q.length-right?"Known words moved to part 1 of the next box. Missed words went to Zero learning.":"Every word moved to part 1 of the next box."}</div></div><div class="ractions" style="grid-template-columns:1fr"><button class="btn" id="rdone">Close</button></div></div>`;$("#rdone").onclick=()=>{L.innerHTML="";render()};return}
+    const c=q[i];
+    L.innerHTML=`<div id="review">
+      <div class="rtop"><button class="iconbtn flat" id="rclose" aria-label="Close review">${ICON.close}</button><div class="prog"><i style="width:${i/q.length*100}%"></i></div><span class="note" style="font-variant-numeric:tabular-nums">${i+1}/${q.length}</span></div>
+      <div class="flash" id="fc">
+        <div style="display:flex;justify-content:space-between;align-items:center"><span class="pill boxpill" style="background:${BOXCOL[c.box]}">${BOXNAME(c.box)}${!practice&&c.box>=2&&c.box<=5?" · part "+c.part:""}${practice?" · practice":""}</span><button class="iconbtn" id="rsp" aria-label="Play pronunciation">${ICON.speak}</button></div>
+        <div class="word">${esc(c.word)}</div>
+        ${c.phon?`<div class="phon">${esc(c.phon)}</div>`:""}
+        <div id="back" hidden>
+          ${c.fa?`<div class="fa">${esc(c.fa)}</div>`:""}
+          ${c.en?`<div class="endef" style="margin-top:10px">${esc(c.en)}</div>`:""}
+          ${c.example?`<div class="ex" style="margin-top:14px">${highlight(c.example,c.word)}</div>`:""}
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:12px">${c.page?`<button class="chipbtn" id="rpage">Book p. ${c.page}</button>`:""}${(c.tags||[]).map(t=>`<span class="chipbtn" style="border-style:dashed">${esc(t)}</span>`).join("")}</div>
+        </div>
+      </div>
+      <div class="ractions" id="ract"><button class="btn block" id="rshow" style="grid-column:1/-1;padding:16px;font-size:17px">Show answer</button></div>
+    </div>`;
+    $("#rclose").onclick=()=>{L.innerHTML="";render()};
+    $("#rsp").onclick=()=>speak(c.word);
+    $("#rshow").onclick=()=>{$("#back").hidden=false;$("#fc").classList.add("shown");
+      $("#ract").innerHTML=`<button class="btn no" id="rno">Didn't know</button><button class="btn yes" id="ryes">Knew it</button>`;
+      $("#rno").onclick=async()=>{if(!practice)await grade(c,false);i++;show()};$("#ryes").onclick=async()=>{if(!practice)await grade(c,true);right++;i++;show()};
+      const rp=$("#rpage");if(rp)rp.onclick=()=>{openReader(c.page)};};
+  };show();
+}
+function highlight(text,word){const t=esc(text);const w=String(word||"").trim();if(!w)return t;
+  const stem=w.toLowerCase().split(/\s+/).map(x=>x.replace(/[^a-z'-]/g,"")).filter(Boolean);if(!stem.length)return t;
+  const base=stem.map(s=>s.length>4?s.slice(0,Math.max(4,s.length-2)):s).map(s=>s.replace(/[-']/g,"\\$&")).join("\\S*\\s+");
+  try{return t.replace(new RegExp("\\b("+base+"\\S*)","i"),"<b>$1</b>")}catch(e){return t}}
+
+/* ---------- Book tab ---------- */
+function tocList(){return (S.book&&S.book.toc)||[]}
+function sectionOf(p){const toc=tocList();let part="",unit="";for(const e of toc){if(e.p>p)break;if(e.l===0){part=e.t;unit=""}else if(e.l===1)unit=e.t}
+  const P=part.replace(/^IELTS\s+/,"").replace(/\s+skills$/,"");return [P,unit].filter(Boolean)}
+function subsKeys(){return tocList().map((e,i)=>({e,i})).filter(x=>x.e.l===2||(x.e.l===1&&!(tocList()[x.i+1]&&tocList()[x.i+1].l===2))||(x.e.l===0&&!(tocList()[x.i+1]&&tocList()[x.i+1].l>0)))}
+function renderBook(m){
+  if(!S.book){setTop("Book","The Official Cambridge Guide to IELTS");
+    m.innerHTML=`<div class="group"><div class="empty"><h3>Add the book</h3><p>Import the book file <b>ielts-guide.lbpack</b> once. It stays on this iPhone and works offline.</p>
+    <button class="btn" id="imp">Import book file</button><p class="loading-note" id="impNote" style="margin-top:12px">Save the file to the Files app first (iCloud Drive or On My iPhone), then pick it here.</p></div></div>`;
+    $("#imp").onclick=()=>$("#packInput").click();return}
+  const subs=subsKeys();const done=subs.filter(x=>S.read[x.i]).length;const pct=subs.length?Math.round(done/subs.length*100):0;
+  setTop("Book",S.book.title,`<button class="btn ghost" id="openLast" style="padding:8px 12px">Open p. ${S.lastPage}</button>`);
+  $("#openLast").onclick=()=>openReader(S.lastPage);
+  const toc=tocList();
+  m.innerHTML=`<div class="group" style="padding:14px"><div style="display:flex;justify-content:space-between;margin-bottom:8px"><b>Your progress</b><span class="note" style="font-variant-numeric:tabular-nums">${done}/${subs.length} lessons · ${pct}%</span></div><div class="progress-line"><i style="width:${pct}%"></i></div></div>
+  <div class="group toc">${toc.map((e,i)=>{const isLeaf=subs.some(x=>x.i===i);const cls=e.l===0?"part":e.l===1?"unit":"sub";
+    return `<div class="row ${cls}">${isLeaf?`<button class="chk" data-read="${i}" aria-pressed="${!!S.read[i]}" aria-label="Mark as studied">${ICON.check}</button>`:""}<button class="grow" data-open="${e.p}" style="border:0;background:none;text-align:left;padding:0">${esc(e.t)}</button><span class="pg">p${e.p}</span></div>`}).join("")}</div>`;
+  m.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>openReader(+b.dataset.open));
+  m.querySelectorAll("[data-read]").forEach(b=>b.onclick=async()=>{const i=b.dataset.read;if(S.read[i])delete S.read[i];else S.read[i]=Date.now();b.setAttribute("aria-pressed",!!S.read[i]);kvSet("read",S.read).catch(()=>{});
+    const d=subs.filter(x=>S.read[x.i]).length,p=Math.round(d/subs.length*100);m.querySelector(".progress-line i").style.width=p+"%";m.querySelector(".group .note").textContent=`${d}/${subs.length} lessons · ${p}%`});
+}
+
+/* built-in book: pages ship with the app in chunks of 20 and are kept in on-device storage after first use */
+async function loadBuiltinBook(){try{const r=await fetch("book/index.json");if(!r.ok)return null;const j=await r.json();
+  const dims={},loc={};j.pages.forEach(([n,w,h,c,o,l])=>{dims[n]=[w,h];loc[n]=[c,o,l]});
+  return {title:j.title,toc:j.toc,count:j.pages.length,dims,loc,first:j.pages[0][0],last:j.pages[j.pages.length-1][0],chunks:Math.max(...j.pages.map(p=>p[3]))+1,builtin:true}}catch(e){return null}}
+const CHUNK={};
+function fetchOcr(ci){if(CHUNK[ci])return CHUNK[ci];const name="c"+String(ci).padStart(2,"0");
+  CHUNK[ci]=fetch(`book/${name}.json`).then(r=>{if(!r.ok)throw new Error("download failed");return r.json()}).catch(e=>{delete CHUNK[ci];throw e});return CHUNK[ci]}
+async function fetchPage(p){
+  const [buf,ocr]=await Promise.all([fetch(`book/p/${p}.webp`).then(r=>{if(!r.ok)throw new Error("page download failed");return r.arrayBuffer()}),fetchOcr(S.book.loc[p][0])]);
+  const rec={mime:"image/webp",buf},words=ocr[p]||[];
+  try{await tx("pages","readwrite",s=>s.put(rec,p));await tx("ocr","readwrite",s=>s.put(words,p))}catch(e){}
+  return {rec,words};
+}
+async function getPage(p){
+  let rec=null,words=null;try{rec=await tx("pages","readonly",s=>s.get(p));words=await tx("ocr","readonly",s=>s.get(p))}catch(e){}
+  if(rec)return {rec,words:words||[]};
+  if(S.book&&S.book.builtin&&S.book.loc[p])return fetchPage(p);
+  return {rec:null,words:[]};
+}
+async function saveAllOffline(say){
+  const letters="abcdefghijklmnopqrstuvwxyz".split("");
+  if(S.book&&S.book.builtin){let have=new Set();try{have=new Set((await tx("pages","readonly",s=>s.getAllKeys()))||[])}catch(e){}
+    const todo=Object.keys(S.book.loc).map(Number).filter(n=>!have.has(n));let done=S.book.count-todo.length;
+    for(let i=0;i<todo.length;i+=6){await Promise.all(todo.slice(i,i+6).map(fetchPage));done=Math.min(S.book.count,done+6);say(`Saving book… ${done} of ${S.book.count} pages`)}}
+  let k=0;for(const c of letters){await Promise.all([getShard("fa",c),getShard("en",c)]);k++;say(`Saving dictionary… ${k} of 26`)}
+}
+async function pagesSaved(){try{return (await tx("pages","readonly",s=>s.count()))||0}catch(e){return 0}}
+
+/* pack import */
+$("#packInput").addEventListener("change",async e=>{const f=e.target.files[0];e.target.value="";if(!f)return;await importPack(f)});
+async function importPack(file){
+  const note=$("#impNote")||{};const say=t=>{note.textContent=t};
+  try{
+    if(!DB)throw new Error("Storage on this device is blocked, so the book can't be saved. Turn off Private Browsing and try again.");
+    say("Reading file…");
+    const head=new Uint8Array(await file.slice(0,12).arrayBuffer());
+    if(new TextDecoder().decode(head.slice(0,8))!=="LBPACK01")throw new Error("This isn't a book file. Pick ielts-guide.lbpack.");
+    const hlen=new DataView(head.buffer).getUint32(8,true);
+    const meta=JSON.parse(new TextDecoder().decode(await file.slice(12,12+hlen).arrayBuffer()));
+    const base=12+hlen;const n=meta.pages.length;
+    for(let i=0;i<n;i+=10){
+      const chunk=meta.pages.slice(i,i+10);const bufs=await Promise.all(chunk.map(p=>file.slice(base+p.off,base+p.off+p.len).arrayBuffer()));
+      await tx("pages","readwrite",s=>{chunk.forEach((p,j)=>s.put({mime:p.mime,buf:bufs[j]},p.n))});
+      await tx("ocr","readwrite",s=>{chunk.forEach(p=>s.put(p.words,p.n))});
+      say(`Saving pages… ${Math.min(n,i+10)} of ${n}`);
+    }
+    S.book={title:meta.title,toc:meta.toc,count:n,dims:Object.fromEntries(meta.pages.map(p=>[p.n,[p.w,p.h]])),first:meta.pages[0].n,last:meta.pages[n-1].n};
+    await kvSet("bookMeta",S.book);toast("Book added");render();
+  }catch(err){say(err.message||"Import failed. Try again.");toast(err.message||"Import failed")}
+}
+
+/* ---------- Reader ---------- */
+const R={p:5,zoom:1,words:[],url:null,sel:null};
+async function openReader(p){
+  if(!S.book){setTab("book");return}
+  p=Math.max(S.book.first,Math.min(S.book.last,p|0));R.p=p;if(!$("#reader"))R.zoom=S.settings.zoom||1;
+  const L=$("#layer");
+  if(!$("#reader")){L.innerHTML=`<div id="reader">
+    <div class="rbar"><button class="iconbtn flat" id="rdBack" aria-label="Close book">${ICON.back}</button><div class="ttl"><div id="rdTitle"></div><div class="rhint">Tap a word · hold and drag for a phrase</div></div><button class="zoombtn" id="rdZoom">1×</button></div>
+    <div id="pageScroll"><div id="pageWrap"><img id="pageImg" alt=""></div></div>
+    <div class="rfoot"><button class="iconbtn" id="rdPrev" aria-label="Previous page">${ICON.back}</button><span class="sp"></span><span class="note">Page</span><input class="field" id="rdNum" inputmode="numeric" aria-label="Page number"><span class="note">of ${S.book.last}</span><span class="sp"></span><button class="iconbtn" id="rdNext" aria-label="Next page">${ICON.next}</button></div></div>`;
+    $("#rdBack").onclick=()=>{L.innerHTML="";render()};
+    $("#rdPrev").onclick=()=>openReader(R.p-1);$("#rdNext").onclick=()=>openReader(R.p+1);
+    $("#rdNum").onchange=e=>openReader(+e.target.value||R.p);
+    $("#rdZoom").onclick=()=>{R.zoom=R.zoom===1?1.6:R.zoom===1.6?2.2:1;S.settings.zoom=R.zoom;saveSettings();layoutPage()};
+    bindSelection($("#pageWrap"));
+    let sx=0,sy=0,st=0;const sc=$("#pageScroll");
+    sc.addEventListener("touchstart",e=>{if(e.touches.length!==1)return;sx=e.touches[0].clientX;sy=e.touches[0].clientY;st=Date.now()},{passive:true});
+    sc.addEventListener("touchend",e=>{if(R.zoom!==1)return;const t=e.changedTouches[0];const dx=t.clientX-sx,dy=t.clientY-sy;if(Date.now()-st<600&&Math.abs(dx)>70&&Math.abs(dx)>Math.abs(dy)*1.8)openReader(R.p+(dx<0?1:-1))},{passive:true});
+    window.addEventListener("resize",layoutPage);
+  }
+  $("#rdNum").value=p;$("#rdTitle").textContent=`p. ${p} · `+sectionOf(p).join(" · ");
+  S.lastPage=p;kvSet("lastPage",p).catch(()=>{});
+  $("#rdTitle").textContent=`p. ${p} · loading…`;
+  let rec=null,words=[];try{const g=await getPage(p);rec=g.rec;words=g.words}catch(e){toast("This page needs an internet connection the first time.")}
+  if(R.p!==p)return;R.words=words;$("#rdTitle").textContent=`p. ${p} · `+sectionOf(p).join(" · ");
+  if(S.book.builtin)[p+1,p+2].forEach(q=>{if(S.book.loc[q])getPage(q).catch(()=>{})});
+  if(R.url)URL.revokeObjectURL(R.url);R.url=rec?URL.createObjectURL(new Blob([rec.buf],{type:rec.mime})):null;
+  const img=$("#pageImg");img.src=R.url||"";img.alt="Book page "+p;
+  $("#pageScroll").scrollTop=0;layoutPage();
+}
+function layoutPage(){
+  const wrap=$("#pageWrap");if(!wrap||!S.book)return;const d=S.book.dims[R.p]||[1100,1425];
+  const vw=$("#pageScroll").clientWidth;const w=Math.min(vw,820)*R.zoom;wrap.style.width=w+"px";
+  $("#rdZoom").textContent=(R.zoom===1?"1":R.zoom)+"×";
+  wrap.querySelectorAll(".w").forEach(n=>n.remove());
+  const saved=new Set(S.cards.map(c=>c.word.toLowerCase()));const sx=100/d[0],sy=100/d[1];
+  const frag=document.createDocumentFragment();
+  R.words.forEach((a,i)=>{const clean=cleanTok(a[6]||a[4]);if(!/[a-z]/i.test(clean))return;const s=document.createElement("span");s.className="w";s.dataset.i=i;
+    s.style.cssText=`left:${a[0]*sx}%;top:${(a[1]-2)*sy}%;width:${a[2]*sx}%;height:${(a[3]+4)*sy}%`;
+    if(saved.has(clean.toLowerCase())||candidates(clean).some(x=>saved.has(x)))s.classList.add("saved");frag.appendChild(s)});
+  wrap.appendChild(frag);
+}
+const cleanTok=t=>String(t||"").replace(/[’‘]/g,"'").replace(/^[^A-Za-z]+|[^A-Za-z]+$/g,"");
+function sentenceAt(i){const W=R.words;if(!W[i])return"";const par=W[i][5];let a=i,b=i;
+  while(a>0&&W[a-1][5]===par&&!/[.!?]["')’]?$/.test(W[a-1][4])&&i-a<30)a--;
+  while(b<W.length-1&&W[b+1][5]===par&&!/[.!?]["')’]?$/.test(W[b][4])&&b-i<30)b++;
+  return W.slice(a,b+1).map(w=>w[4]).join(" ").replace(/(\w)- (\w)/g,"$1$2").replace(/\s+([,.;:?!])/g,"$1").trim()}
+/* tap a word = that word; hold then drag (or click-drag with a mouse) = a phrase */
+function bindSelection(pw){
+  let press=null,selecting=false;
+  const wAt=(x,y)=>{const el=document.elementFromPoint(x,y);return el&&el.classList&&el.classList.contains("w")?+el.dataset.i:null};
+  const begin=i=>{selecting=true;R.anchor=i;R.sel={a:i,b:i};markSel();try{navigator.vibrate&&navigator.vibrate(12)}catch(_){}};
+  const extend=(x,y)=>{const i=wAt(x,y);if(i==null)return;R.sel={a:Math.min(R.anchor,i),b:Math.max(R.anchor,i)};if(R.sel.b-R.sel.a>15){if(i>R.anchor)R.sel.b=R.sel.a+15;else R.sel.a=R.sel.b-15}markSel()};
+  const finish=()=>{selecting=false;openWordSheet({fromBook:true})};
+  pw.addEventListener("touchstart",e=>{if(e.touches.length!==1)return;const s=e.target.closest(".w");if(!s)return;const t=e.touches[0];const i=+s.dataset.i;
+    press={i,x:t.clientX,y:t.clientY,timer:setTimeout(()=>begin(i),380)}},{passive:true});
+  pw.addEventListener("touchmove",e=>{const t=e.touches[0];
+    if(selecting){e.preventDefault();extend(t.clientX,t.clientY);return}
+    if(press&&Math.hypot(t.clientX-press.x,t.clientY-press.y)>10){clearTimeout(press.timer);press=null}},{passive:false});
+  pw.addEventListener("touchend",e=>{if(selecting){e.preventDefault();press&&clearTimeout(press.timer);press=null;finish();return}
+    if(press){clearTimeout(press.timer);const i=press.i;press=null;e.preventDefault();R.sel={a:i,b:i};markSel();openWordSheet({fromBook:true})}},{passive:false});
+  pw.addEventListener("touchcancel",()=>{if(press)clearTimeout(press.timer);press=null;selecting=false});
+  pw.addEventListener("pointerdown",e=>{if(e.pointerType!=="mouse"||e.button!==0)return;const s=e.target.closest(".w");if(!s)return;e.preventDefault();begin(+s.dataset.i)});
+  pw.addEventListener("pointermove",e=>{if(e.pointerType==="mouse"&&selecting)extend(e.clientX,e.clientY)});
+  window.addEventListener("pointerup",e=>{if(e.pointerType==="mouse"&&selecting)finish()});
+}
+function markSel(){document.querySelectorAll("#pageWrap .w.sel").forEach(n=>n.classList.remove("sel"));if(!R.sel)return;for(let k=R.sel.a;k<=R.sel.b;k++){const n=document.querySelector(`#pageWrap .w[data-i="${k}"]`);if(n)n.classList.add("sel")}}
+function selText(){const W=R.words;const out=[];for(let k=R.sel.a;k<=R.sel.b;k++){const w=W[k];if(w)out.push(cleanTok(w[6]&&k===R.sel.a?w[6]:w[4]))}
+  const t=out.filter(Boolean).join(" ");return R.sel.a===R.sel.b&&R.words[R.sel.a]&&R.words[R.sel.a][6]?cleanTok(R.words[R.sel.a][6]):t}
+function stepSel(side,delta){const W=R.words;const n=W.length;if(side==="a"){const na=R.sel.a+delta;if(na<0||na>R.sel.b)return;R.sel.a=na}else{const nb=R.sel.b+delta;if(nb>=n||nb<R.sel.a)return;R.sel.b=nb}markSel();openWordSheet({fromBook:true,keepTags:true})}
+
+/* ---------- Word sheet (add / edit) ---------- */
+let SH=null;
+function closeSheet(){const l=$("#sheetLayer");if(l)l.remove();SH=null;if(R.sel){R.sel=null;markSel()}}
+async function openWordSheet(opts){
+  await loadDicts();
+  let word,example="",page=null,card=opts.card||null;
+  if(opts.fromBook){word=selText();example=sentenceAt(R.sel.a);page=R.p}else if(card){word=card.word;example=card.example;page=card.page}else{word=opts.word||""}
+  const existing=card||S.cards.find(c=>c.word.toLowerCase()===word.toLowerCase());
+  if(existing&&!card&&opts.fromBook)card=existing;
+  const prevTags=opts.keepTags&&SH?SH.tags:null;
+  SH={card,word,example:card&&!opts.fromBook?card.example:example,page:card&&!opts.fromBook?card.page:page,phon:card?card.phon:"",tags:prevTags||(card?[...(card.tags||[])]:(page?sectionOf(page):[])),fa:[],en:[],faSel:new Set(),enSel:new Set(),customFa:card?card.fa:"",customEn:card?card.en:""};
+  if(card&&opts.fromBook){SH.example=card.example||example;SH.page=card.page||page}
+  drawSheet();lookupInto(word);if(!word){setTimeout(()=>{const i=$("#shWord");if(i)i.focus()},60)}
+}
+async function lookupInto(word){
+  if(!SH)return;const w=word.trim();if(!w){SH.fa=[];SH.en=[];SH.pending=false;drawOptions();return}
+  SH.pending=true;drawOptions();
+  const off=await offlineLookup(w);if(!SH||SH.word!==word)return;
+  SH.fa=off.fa;SH.en=off.en;SH.head=off.head;
+  if(!SH.card){SH.faSel=new Set(SH.fa.slice(0,3).map((_,i)=>i));SH.enSel=new Set(SH.en.length?[0]:[])}
+  const goOnline=ONLINE_OK&&S.settings.online&&navigator.onLine!==false;
+  SH.pending=goOnline;drawOptions();if(!goOnline)return;
+  const on=await onlineLookup(off.head&&off.head!==w.toLowerCase()&&!w.includes(" ")?off.head:w);
+  if(!SH||SH.word!==word)return;SH.pending=false;
+  if(on.phon&&!SH.phon){SH.phon=on.phon;const p=$("#shPhon");if(p)p.value=on.phon}
+  const fa0=SH.fa.length,en0=SH.en.length;
+  on.fa.forEach(x=>{if(!SH.fa.some(y=>y.t===x.t))SH.fa.push(x)});on.en.forEach(x=>{if(!SH.en.some(y=>y.t===x.t))SH.en.push(x)});
+  if(!SH.card){if(!fa0)SH.fa.slice(0,2).forEach((_,i)=>SH.faSel.add(i));if(!en0&&SH.en.length)SH.enSel.add(0)}
+  drawOptions();
+}
+async function drawSuggest(){
+  const box=$("#sugg");if(!box||!SH)return;const q=SH.word;const list=await suggest(q);if(!SH||SH.word!==q)return;
+  const exact=list.length===1&&list[0]===q.toLowerCase().trim();
+  box.innerHTML=exact?"":list.map(w=>`<button class="chipbtn" data-sg="${esc(w)}">${esc(w)}</button>`).join("");
+  box.querySelectorAll("[data-sg]").forEach(b=>b.onclick=()=>{const w=b.dataset.sg;$("#shWord").value=w;SH.word=w;box.innerHTML="";SH.faSel=new Set();SH.enSel=new Set();lookupInto(w)});
+}
+function drawSheet(){
+  let l=$("#sheetLayer");if(!l){l=document.createElement("div");l.id="sheetLayer";document.body.appendChild(l)}
+  const c=SH.card;const fromBook=!!R.sel;
+  l.innerHTML=`<div id="scrim"></div><div id="sheet" role="dialog" aria-label="Word">
+    <div class="grab"></div>
+    <div class="sbody">
+      <div class="headrow"><input id="shWord" value="${esc(SH.word)}" aria-label="Word or phrase" autocapitalize="off" autocomplete="off" spellcheck="false"><button class="iconbtn" id="shSpeak" aria-label="Play pronunciation">${ICON.speak}</button><button class="iconbtn flat" id="shClose" aria-label="Close">${ICON.close}</button></div>
+      <div class="extend" id="sugg" aria-label="Suggestions"></div>
+      ${fromBook?`<div class="extend"><button class="chipbtn" data-st="a,-1">＋ word before</button><button class="chipbtn" data-st="b,1">＋ word after</button>${R.sel.b>R.sel.a?`<button class="chipbtn" data-st="b,-1">− last word</button>`:""}</div>`:""}
+      ${c?`<div class="locrow"><span class="note">Location</span><select class="field" id="shBox" aria-label="Box">${[0,1,2,3,4,5,6].map(b=>`<option value="${b}" ${b===c.box?"selected":""}>${BOXNAME(b)}</option>`).join("")}</select><select class="field" id="shPart" aria-label="Part"></select></div>`:`<div class="note" style="margin:4px 0">New words start in Zero learning.</div>`}
+      <input class="field" id="shPhon" placeholder="Pronunciation, e.g. /ˈæspekt/" value="${esc(SH.phon)}" style="margin-top:6px;font-size:15px;padding:7px 10px">
+      <label class="lbl">Persian meaning <span class="src" id="faState"></span></label>
+      <div class="opts" id="faOpts"></div>
+      <textarea class="field fa" id="shFa" placeholder="Write or edit the Persian meaning" style="min-height:48px;font-size:17px;margin-top:6px">${esc(SH.customFa)}</textarea>
+      <label class="lbl">English meaning</label>
+      <div class="opts" id="enOpts"></div>
+      <textarea class="field" id="shEn" placeholder="Write or edit the English definition" style="min-height:48px;margin-top:6px">${esc(SH.customEn)}</textarea>
+      <label class="lbl">Example from the book ${SH.page?`<span class="src">page ${SH.page}</span>`:""}</label>
+      <textarea class="field" id="shEx" placeholder="A sentence that uses the word">${esc(SH.example)}</textarea>
+      <label class="lbl">Tags</label>
+      <div class="tagbox" id="tagbox"></div>
+      ${c?`<div style="margin-top:18px" id="delZone"><button class="btn danger" id="shDel">Delete word</button> </div>`:""}
+    </div>
+    <div class="sfoot">${c?`<button class="btn" id="shSave">Save changes</button>`:`<button class="btn" id="shSave">Add to Leitner</button>`}</div>
+  </div>`;
+  $("#scrim").onclick=closeSheet;$("#shClose").onclick=closeSheet;
+  $("#shSpeak").onclick=()=>speak($("#shWord").value);
+  let wt;$("#shWord").oninput=e=>{SH.word=e.target.value;drawSuggest();clearTimeout(wt);wt=setTimeout(()=>{SH.faSel=new Set();SH.enSel=new Set();lookupInto(SH.word)},350)};
+  $("#shFa").oninput=()=>{SH.faEdited=true};$("#shEn").oninput=()=>{SH.enEdited=true};
+  l.querySelectorAll("[data-st]").forEach(b=>b.onclick=()=>{const[s,d]=b.dataset.st.split(",");stepSel(s,+d)});
+  drawTags();drawOptions();
+  $("#shSave").onclick=saveFromSheet;
+  if(c){$("#shDel").onclick=()=>{$("#delZone").innerHTML=`<div class="confirm"><span>Delete “${esc(c.word)}”?</span><button class="btn danger" id="shDel2">Delete</button><button class="btn plain" id="shDelNo">Keep</button></div>`;
+      $("#shDel2").onclick=async()=>{await deleteCard(c.id);closeSheet();toast("Deleted");refreshAfterEdit()};$("#shDelNo").onclick=drawSheet};
+    const bx=$("#shBox"),pt=$("#shPart");const fillParts=()=>{const b=+bx.value;const P=b>=2&&b<=5?SIZE[b]:0;pt.hidden=!P;pt.innerHTML=P?Array.from({length:P},(_,i)=>`<option value="${i+1}" ${b===c.box&&i+1===(c.part||1)?"selected":""}>Part ${i+1}${i+1===P?" (review)":""}</option>`).join(""):""};
+    fillParts();bx.onchange=fillParts;}
+}
+function drawOptions(){
+  if(!SH)return;const fo=$("#faOpts"),eo=$("#enOpts");if(!fo)return;
+  const empty=kind=>!SH.word.trim()?`Type a word above and its meaning fills in automatically.`:SH.pending?"Looking up…":kind==="fa"?"No Persian meaning found. Pick a suggestion above or type one below.":"No English definition found. Type one below.";
+  fo.innerHTML=SH.fa.slice(0,10).map((x,i)=>`<button class="opt faopt" data-fa="${i}" aria-pressed="${SH.faSel.has(i)}"><span class="dot"></span><span class="grow fa" style="font-size:17px">${esc(x.t)} <span class="src" style="direction:ltr;display:inline-block">${esc(x.src)}</span></span></button>`).join("")||`<div class="note">${empty("fa")}</div>`;
+  eo.innerHTML=SH.en.slice(0,8).map((x,i)=>`<button class="opt" data-en="${i}" aria-pressed="${SH.enSel.has(i)}"><span class="dot"></span><span class="grow endef"><em>${esc(x.pos||"")}</em>${esc(x.t)}<span class="src">${esc(x.src)}</span></span></button>`).join("")||`<div class="note">${empty("en")}</div>`;
+  fo.querySelectorAll("[data-fa]").forEach(b=>b.onclick=()=>{const i=+b.dataset.fa;SH.faEdited=false;SH.faSel.has(i)?SH.faSel.delete(i):SH.faSel.add(i);b.setAttribute("aria-pressed",SH.faSel.has(i));syncText()});
+  eo.querySelectorAll("[data-en]").forEach(b=>b.onclick=()=>{const i=+b.dataset.en;SH.enEdited=false;SH.enSel.has(i)?SH.enSel.delete(i):SH.enSel.add(i);b.setAttribute("aria-pressed",SH.enSel.has(i));syncText()});
+  if(!SH.card||SH.touched)syncText();
+}
+function syncText(){if(!SH)return;SH.touched=true;
+  const fa=[...SH.faSel].sort((a,b)=>a-b).map(i=>SH.fa[i]&&SH.fa[i].t).filter(Boolean).join("، ");
+  const en=[...SH.enSel].sort((a,b)=>a-b).map(i=>SH.en[i]&&((SH.en[i].pos?"("+SH.en[i].pos+") ":"")+SH.en[i].t)).filter(Boolean).join("\n");
+  if(SH.card&&!SH.faSel.size&&!SH.enSel.size)return;
+  if(!SH.faEdited)$("#shFa").value=fa;if(!SH.enEdited)$("#shEn").value=en}
+function drawTags(){const tb=$("#tagbox");tb.innerHTML=SH.tags.map((t,i)=>`<button class="tag" data-t="${i}" aria-label="Remove tag ${esc(t)}">${esc(t)}</button>`).join("")+`<input id="tagIn" placeholder="Add tag" list="tagList" enterkeyhint="done"><datalist id="tagList">${allTags().map(t=>`<option value="${esc(t)}">`).join("")}</datalist>`;
+  tb.querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>{SH.tags.splice(+b.dataset.t,1);drawTags()});
+  const inp=$("#tagIn");const commit=()=>{const v=inp.value.trim();if(v&&!SH.tags.includes(v)){SH.tags.push(v);drawTags();$("#tagIn").focus()}else inp.value=""};
+  inp.onkeydown=e=>{if(e.key==="Enter"||e.key===","){e.preventDefault();commit()}};inp.onchange=commit}
+function allTags(){const s=new Set();S.cards.forEach(c=>(c.tags||[]).forEach(t=>s.add(t)));return [...s].sort()}
+async function saveFromSheet(){
+  const word=$("#shWord").value.trim();if(!word){toast("Type a word first.");return}
+  const ti=$("#tagIn");if(ti&&ti.value.trim()&&!SH.tags.includes(ti.value.trim()))SH.tags.push(ti.value.trim());
+  const f={word,phon:$("#shPhon").value.trim(),fa:$("#shFa").value.trim(),en:$("#shEn").value.trim(),example:$("#shEx").value.trim(),page:SH.page,tags:SH.tags};
+  let c=SH.card;const dup=!c&&S.cards.find(x=>x.word.toLowerCase()===word.toLowerCase());if(dup)c=dup;
+  if(c){Object.assign(c,f);const bx=$("#shBox");if(bx&&SH.card===c){const nb=+bx.value,np=+($("#shPart").value||1);if(nb!==c.box||(nb>=2&&nb<=5&&np!==(c.part||1))){await moveCard(c,nb,np);toast(`Moved to ${BOXNAME(nb)}${nb>=2&&nb<=5?", part "+np:""}`)}else{await saveCard(c);toast("Saved")}}else{await saveCard(c);toast("Saved")}}
+  else{await saveCard(newCard(f));toast(`“${word}” added to Zero learning`)}
+  closeSheet();refreshAfterEdit();
+}
+function refreshAfterEdit(){if($("#reader"))layoutPage();if(!$("#reader")&&!$("#review"))render()}
+
+/* ---------- Words tab ---------- */
+function renderCards(m){
+  setTop("Words",`${S.cards.length} word${S.cards.length===1?"":"s"} in your Leitner box`);
+  const tags=allTags();
+  m.innerHTML=`<div class="search"><input class="field" id="q" type="search" placeholder="Search words or meanings" value="${esc(S.q)}" autocapitalize="off"></div>
+  <div class="filters" id="fb">${[-1,0,1,2,3,4,5,6].map(b=>`<button class="chipbtn" data-b="${b}" aria-pressed="${S.filterBox===b}">${b<0?"All":b===0?"Zero":b===6?"Mastered":"Box "+b}</button>`).join("")}</div>
+  ${tags.length?`<div class="filters" id="ft"><button class="chipbtn" data-tg="" aria-pressed="${!S.filterTag}">All tags</button>${tags.map(t=>`<button class="chipbtn" data-tg="${esc(t)}" aria-pressed="${S.filterTag===t}">${esc(t)}</button>`).join("")}</div>`:""}
+  <div class="group" id="clist"></div><div style="height:70px"></div>`;
+  const fab=document.createElement("button");fab.className="fab";fab.setAttribute("aria-label","Add a word");fab.innerHTML=ICON.plus;m.appendChild(fab);fab.onclick=()=>{closeSheet();R.sel=null;openWordSheet({word:""})};
+  const draw=()=>{const q=S.q.toLowerCase();const L=S.cards.filter(c=>(S.filterBox<0||c.box===S.filterBox)&&(!S.filterTag||(c.tags||[]).includes(S.filterTag))&&(!q||(c.word+" "+c.fa+" "+c.en).toLowerCase().includes(q))).sort((a,b)=>b.created-a.created);
+    $("#clist").innerHTML=L.length?L.map(c=>`<button class="row cardrow" data-id="${c.id}" style="width:100%;border:0;border-bottom:1px solid var(--line);background:none;text-align:left"><div class="grow"><div class="w1">${esc(c.word)}</div><div class="fa1">${esc(c.fa||c.en||"")}</div></div><span class="pill boxpill" style="background:${BOXCOL[c.box]}">${c.box===0?"Zero":c.box===6?"✓":c.box+(c.box>1?"·"+c.part:"")}</span></button>`).join(""):`<div class="empty"><h3>${S.cards.length?"No matches":"No words yet"}</h3><p>${S.cards.length?"Try another search or filter.":"Tap a word in the book, or use the + button to add one by hand."}</p></div>`;
+    $("#clist").querySelectorAll("[data-id]").forEach(b=>b.onclick=()=>openWordSheet({card:S.cards.find(c=>c.id===b.dataset.id)}))};
+  $("#q").oninput=e=>{S.q=e.target.value;draw()};
+  $("#fb").onclick=e=>{const b=e.target.closest("[data-b]");if(!b)return;S.filterBox=+b.dataset.b;renderCards(m)};
+  const ft=$("#ft");if(ft)ft.onclick=e=>{const b=e.target.closest("[data-tg]");if(!b)return;S.filterTag=b.dataset.tg;renderCards(m)};
+  draw();
+}
+
+/* ---------- Settings ---------- */
+async function renderSettings(m){
+  setTop("Settings","");await loadDicts().catch(()=>{});
+  let est="";try{if(navigator.storage&&navigator.storage.estimate){const e=await navigator.storage.estimate();est=`${Math.round((e.usage||0)/1048576)} MB used on this device`}}catch(e){}
+  const off=DICT.faCount,defs=DICT.enCount;const saved=await pagesSaved();
+  m.innerHTML=`
+  <div class="group-title">Pronunciation</div>
+  <div class="group">
+    <div class="row"><div class="grow">Accent</div><select class="field" id="stAcc" style="width:auto"><option value="en-GB">British</option><option value="en-US">American</option><option value="en-AU">Australian</option></select></div>
+    <div class="row"><div class="grow">Speed</div><input type="range" id="stRate" min="0.5" max="1.2" step="0.1" value="${S.settings.rate}" style="width:140px"></div>
+    <div class="row"><div class="grow"><button class="btn ghost" id="stTest">Play sample</button></div></div>
+  </div>
+  <div class="group-title">Dictionary</div>
+  <div class="group">
+    <div class="row"><div class="grow">Offline English–Persian<div class="muted">${off.toLocaleString()} words · built into the app</div></div></div>
+    <div class="row"><div class="grow">Offline English definitions<div class="muted">${defs.toLocaleString()} words · WordNet, built into the app</div></div></div>
+    ${ONLINE_OK?`<div class="row"><div class="grow">Online lookup<div class="muted">Adds pronunciation and more meanings when you're connected</div></div><input type="checkbox" id="stOn" ${S.settings.online?"checked":""} style="width:22px;height:22px"></div>`:""}
+    <div class="row"><div class="grow">Your dictionary<div class="muted" id="udInfo">${DICT.user.size?DICT.user.size.toLocaleString()+" entries · checked first":"CSV, TSV, TXT or JSON · one word and meaning per line"}</div></div><button class="btn ghost" id="udUp" style="padding:8px 12px">Upload</button></div>
+    ${DICT.user.size?`<div class="row" id="udClearRow"><button class="btn plain" id="udClear" style="color:var(--bad)">Remove your dictionary</button></div>`:""}
+  </div>
+  <div class="note" style="margin:-10px 4px 14px">Format example: <code>abundant,فراوان</code> or <code>{"abundant":"فراوان"}</code></div>
+  <div class="group-title">Book</div>
+  <div class="group">
+    <div class="row"><div class="grow">${S.book?esc(S.book.title):"No book added"}<div class="muted">${S.book?(S.book.builtin?`Built into the app · ${saved} of ${S.book.count} pages saved on this device`:S.book.count+" pages"):""}${est?" · "+est:""}</div></div>${S.book&&S.book.builtin?"":`<button class="btn ghost" id="bkImp" style="padding:8px 12px">${S.book?"Replace":"Import"}</button>`}</div>
+    ${S.book&&S.book.builtin?`<div class="row"><div class="grow"><button class="btn ghost" id="bkAll">Save whole book and dictionary on this device</button></div></div>`:""}
+    ${S.book?`<div class="row" id="bkRmRow"><button class="btn plain" id="bkRm" style="color:var(--bad)">${S.book.builtin?"Free up space (pages download again when opened)":"Remove book from this device"}</button></div>`:""}
+    <div class="row"><div class="note grow" id="impNote">Your words and review history stay on this iPhone.</div></div>
+  </div>
+  <div class="note" style="margin:0 4px 30px">Leitner box: Zero learning, then 5 sections with 1, 2, 4, 8 and 15 parts. Only box 1 and the last part of each section are reviewed. Pass box 5 and the word is mastered.<br><br>Dictionary data: English–Persian Word Database (Apache 2.0), WordNet (Princeton / Open English WordNet).</div>`;
+  $("#stAcc").value=S.settings.accent;$("#stAcc").onchange=e=>{S.settings.accent=e.target.value;saveSettings()};
+  $("#stRate").onchange=e=>{S.settings.rate=+e.target.value;saveSettings()};
+  $("#stTest").onclick=()=>speak("Candidates should concentrate on the main ideas.");
+  const so=$("#stOn");if(so)so.onchange=e=>{S.settings.online=e.target.checked;saveSettings()};
+  $("#udUp").onclick=()=>$("#dictInput").click();
+  const uc=$("#udClear");if(uc)uc.onclick=()=>{$("#udClearRow").innerHTML=`<div class="confirm"><span>Remove your dictionary?</span><button class="btn danger" id="udC2">Remove</button><button class="btn plain" id="udCn">Keep</button></div>`;$("#udC2").onclick=async()=>{await tx("udict","readwrite",s=>s.clear()).catch(()=>{});DICT.user.clear();render()};$("#udCn").onclick=render};
+  const bi=$("#bkImp");if(bi)bi.onclick=()=>$("#packInput").click();
+  const ba=$("#bkAll");if(ba)ba.onclick=async()=>{ba.disabled=true;const say=t=>{$("#impNote").textContent=t};try{await saveAllOffline(say);say("Everything is saved. The book opens without downloading.");toast("Saved on this device")}catch(e){say("Download stopped. Check your connection and tap again.")}ba.disabled=false};
+  const rm=$("#bkRm");if(rm)rm.onclick=()=>{$("#bkRmRow").innerHTML=`<div class="confirm"><span>${S.book.builtin?"Delete saved pages?":"Remove the book?"} Your words stay.</span><button class="btn danger" id="bkR2">Remove</button><button class="btn plain" id="bkRn">Keep</button></div>`;
+    $("#bkR2").onclick=async()=>{await tx("pages","readwrite",s=>s.clear()).catch(()=>{});await tx("ocr","readwrite",s=>s.clear()).catch(()=>{});await tx("kv","readwrite",s=>s.delete("bookMeta")).catch(()=>{});if(!S.book.builtin)S.book=null;Object.keys(CHUNK).forEach(k=>delete CHUNK[k]);render()};$("#bkRn").onclick=render};
+}
+$("#dictInput").addEventListener("change",async e=>{const f=e.target.files[0];e.target.value="";if(!f)return;
+  try{const txt=await f.text();const pairs=parseDict(txt);if(!pairs.length)throw new Error("No entries found. Use one “word,meaning” per line.");
+    await tx("udict","readwrite",s=>{pairs.forEach(([w,m])=>{const k=w.toLowerCase().trim();const prev=DICT.user.get(k);const v=prev&&!prev.includes(m)?prev+"; "+m:m;DICT.user.set(k,v);s.put(v,k)})});
+    toast(`${pairs.length.toLocaleString()} entries added`);render()}catch(err){toast(err.message||"Could not read that file.")}});
+function parseDict(txt){txt=txt.replace(/^\uFEFF/,"").trim();const out=[];
+  if(/^[\[{]/.test(txt)){try{const j=JSON.parse(txt);
+    if(Array.isArray(j))j.forEach(x=>{if(Array.isArray(x)&&x.length>=2)out.push([String(x[0]),String(x[1])]);else if(x&&typeof x==="object"){const w=x.word||x.en||x.english||x.term||x.w;const m=x.meaning||x.fa||x.persian||x.translation||x.definition||x.m;if(w&&m)out.push([String(w),Array.isArray(m)?m.join("; "):String(m)])}});
+    else Object.entries(j).forEach(([w,m])=>out.push([w,Array.isArray(m)?m.join("; "):String(m)]));return out}catch(e){}}
+  txt.split(/\r?\n/).forEach(line=>{line=line.trim();if(!line||line.startsWith("#"))return;const m=line.match(/^(.+?)\s*(?:\t|,|=|:|\s-\s)\s*(.+)$/);if(m)out.push([m[1].replace(/^"|"$/g,""),m[2].replace(/^"|"$/g,"")])});
+  return out}
+
+/* ---------- boot ---------- */
+(async()=>{await loadAll();render();loadDicts();
+  try{if("serviceWorker"in navigator&&location.protocol==="https:"&&!/claude|anthropic|usercontent/.test(location.hostname))navigator.serviceWorker.register("sw.js").catch(()=>{})}catch(e){}
+})();
+</script>
+
+</body>
+</html>

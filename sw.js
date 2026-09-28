@@ -1,0 +1,10 @@
+const V="leitner-v5";
+const FILES=["./", "index.html", "manifest.webmanifest", "icons/icon-180.png", "icons/icon-192.png", "icons/icon-512.png", "dict/common.json", "dict/forms.json", "dict/en/_.json", "dict/en/a.json", "dict/en/b.json", "dict/en/c.json", "dict/en/d.json", "dict/en/e.json", "dict/en/f.json", "dict/en/g.json", "dict/en/h.json", "dict/en/i.json", "dict/en/j.json", "dict/en/k.json", "dict/en/l.json", "dict/en/m.json", "dict/en/n.json", "dict/en/o.json", "dict/en/p.json", "dict/en/q.json", "dict/en/r.json", "dict/en/s.json", "dict/en/t.json", "dict/en/u.json", "dict/en/v.json", "dict/en/w.json", "dict/en/x.json", "dict/en/y.json", "dict/en/z.json", "dict/fa/a.json", "dict/fa/b.json", "dict/fa/c.json", "dict/fa/d.json", "dict/fa/e.json", "dict/fa/f.json", "dict/fa/g.json", "dict/fa/h.json", "dict/fa/i.json", "dict/fa/j.json", "dict/fa/k.json", "dict/fa/l.json", "dict/fa/m.json", "dict/fa/n.json", "dict/fa/o.json", "dict/fa/p.json", "dict/fa/q.json", "dict/fa/r.json", "dict/fa/s.json", "dict/fa/t.json", "dict/fa/u.json", "dict/fa/v.json", "dict/fa/w.json", "dict/fa/x.json", "dict/fa/y.json", "dict/fa/z.json"];
+self.addEventListener("install",e=>{e.waitUntil(caches.open(V).then(c=>c.addAll(FILES)).then(()=>self.skipWaiting()))});
+self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==V).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
+self.addEventListener("fetch",e=>{if(e.request.method!=="GET")return;const u=new URL(e.request.url);
+  if(u.origin===location.origin){
+    if(e.request.mode==="navigate"){e.respondWith(fetch(e.request).then(n=>{caches.open(V).then(c=>c.put("index.html",n.clone()));return n}).catch(()=>caches.match("index.html")));return}
+    e.respondWith(caches.match(e.request,{ignoreSearch:true}).then(r=>r||fetch(e.request)));return}
+  if(/fonts\.(googleapis|gstatic)\.com/.test(u.host)){e.respondWith(caches.open(V).then(c=>c.match(e.request).then(r=>r||fetch(e.request).then(n=>{c.put(e.request,n.clone());return n}))))}
+});
